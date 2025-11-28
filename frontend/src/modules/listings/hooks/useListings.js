@@ -4,24 +4,32 @@ import { useApiState } from "./useApiState";
 
 export default function useListings() {
   const [listings, setListings] = useState([]);
+  const [queryCached,setQueryCached] = useState({})
 
   const {
     loading,
     setLoading,
     error,
+    setError,
     handleError,
   } = useApiState();
 
   async function fetchListings(searchQuery) {
-    setLoading(true);
-    try {
-      const data = await getListings(searchQuery);
-      setListings(data);
-    } catch (err) {
-      handleError(err)
-    } finally {
-      setLoading(false);
+    if(JSON.stringify(queryCached) !== JSON.stringify(searchQuery)){
+      setError(null);
+      setLoading(true);
+      setListings([]);
+      try {
+        const data = await getListings(searchQuery);
+        setListings(data);
+      } catch (err) {
+        handleError(err)
+      } finally {
+        setQueryCached(searchQuery);
+        setLoading(false);
+      }
     }
+ 
   }
 
 

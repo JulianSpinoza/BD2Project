@@ -14,8 +14,9 @@ export default function ListingsPage() {
   } = useListings();
 
   const handleSearch = () => {
-    const query = {
-      municipality: filterMunicipality
+    const query = {};
+    if(filterMunicipality != ""){
+      query.municipality = filterMunicipality;
     }
     fetchListings(query);
   };
