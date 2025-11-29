@@ -1,0 +1,25 @@
+/* Contenedor general */
+.listings-page {
+  width: 100%;
+  max-width: 1200px;      /* Opcional: limite de ancho centrado */
+  background-color: blue;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.listings-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.listings-grid {
+  display: grid;
+  /* Máx 4, pero automático según el espacio */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+
+  /* Para que no se vuelva enorme en pantallas gigantes */
+  max-width: 1200px;
+  width: 100%;
+}
