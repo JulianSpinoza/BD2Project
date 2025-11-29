@@ -1,61 +1,122 @@
-import React, {useEffect, useState} from "react";
+import React, { useState } from "react";
 import './Login.css'
-function Login({auth}) {
 
-    // const LOGIN_URL = 'auth/login'
-    // const [userName, setUserName] = useState("");
-    // const [password, setPassword] = useState("");
+function Login({ onLogin, onClose }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-    
-    // const login = (userName,password)=>{
-    //     return axios
-    //   .post(LOGIN_URL, {
-    //     "username":userName,
-    //     "password":password,
-    //   })  
-    //   .then((response) => {
-    //         console.log(response)
-    //         return response
+    // Validation
+    if (!username.trim() || !password.trim()) {
+      setError("Please enter both username and password");
+      setIsLoading(false);
+      return;
+    }
 
-    //   })
-    // }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      setIsLoading(false);
+      return;
+    }
 
-    // const handLogin = async (e) => {
-    //     e.preventDefault();
-    //     const dataResponse = await login(userName,password);
-    //     const resStatus = dataResponse.status;
-    //     const resInfo = dataResponse.data; 
-    //     console.log(dataResponse);
+    try {
+      // TODO: Replace with actual API call
+      // const response = await httpClient.post("users/login/", {
+      //   username,
+      //   password,
+      // });
 
-    //     if (resStatus === 200){
-    //         auth(true)
-    //         alert('Bienvenido: '+resInfo.firstName+" Email: "+resInfo.email )
-    //     }else{
-    //         alert('Credenciales invalidas')
-    //     }
-    // }
+      // Simulate API call with mock authentication
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    return (
-        <div>
-            <form className="form" >
-                <div  class="title">Welcome,<br/><span>sign up to continue</span></div>
-                {/*<label class="input" htmlFor='username'>Username:</label>
-                <input  type="text" id="username" onChange={(e) => setUserName(e.target.value)}/> */}
-                
-                <input class="input" name="username" placeholder="Username" type="text" id="username" />
-                
-                {/* <label class="input" htmlFor='password'>Password:</label> 
-                <input type="password" id="password" onChange={(e) => setPassword(e.target.value)}/>*/}
+      // Mock successful login
+      const userData = {
+        id: 1,
+        username: username,
+        email: `${username}@colombianstay.com`,
+        firstName: username.charAt(0).toUpperCase() + username.slice(1),
+        isAuthenticated: true,
+      };
 
-                <input class="input" name="password" placeholder="Password" type="password" id="password" />
+      onLogin(userData);
+    } catch (err) {
+      setError(err.response?.data?.detail || "Invalid credentials. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-                <button class="button-confirm" >Let`s go</button>
+  return (
+    <div className="login-overlay" onClick={onClose}>
+      <div className="login-container" onClick={(e) => e.stopPropagation()}>
+        <button
+          className="close-button"
+          onClick={onClose}
+          type="button"
+          aria-label="Close modal"
+        >
+          ✕
+        </button>
+        <div className="login-wrapper">
+          <form className="form" onSubmit={handleSubmit}>
+          <div className="title">
+            Welcome,<br />
+            <span>sign up to continue</span>
+          </div>
 
-                
-            </form>
-        </div>
-    )
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+
+          <input
+            className="input"
+            name="username"
+            placeholder="Username"
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            disabled={isLoading}
+          />
+
+          <input
+            className="input"
+            name="password"
+            placeholder="Password"
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+          />
+
+          <button
+            className="button-confirm"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Loading..." : "Let's go"}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="button-cancel"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+    </div>
+  );
 }
 
 export default Login
