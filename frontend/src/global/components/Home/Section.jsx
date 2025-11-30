@@ -1,5 +1,5 @@
 import React from "react";
-import ListingCard from "../ListingCard/ListingCard.jsx";
+import ListingCard from "../../../modules/users/components/ListingCard/ListingCard.jsx";
 
 export default function Section({ title, listings }) {
   return (

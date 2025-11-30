@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar/Navbar.jsx";
 import CategoryBar from "../CategoryBar/CategoryBar.jsx";
-import ListingCard from "../ListingCard/ListingCard.jsx";
+import ListingCard from "../../../modules/users/components/ListingCard/ListingCard.jsx";
 import "./HomePage.css";
 
 const HomePage = ({ user, onLogout, onLoginClick, onSignupClick }) => {
