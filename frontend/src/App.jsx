@@ -9,10 +9,6 @@ function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  const handleLogout = () => {
-    setUser(null);
-  };
-
   const handleLoginClick = () => {
     setShowLoginModal(true);
   };
@@ -25,7 +21,6 @@ function App() {
     <div className="w-full">
       <AuthProvider>
         <HomePage 
-          onLogout={handleLogout}
           onLoginClick={handleLoginClick}
           onSignupClick={handleSignupClick}
         />

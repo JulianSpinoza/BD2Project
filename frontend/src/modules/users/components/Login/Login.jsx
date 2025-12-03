@@ -49,15 +49,6 @@ function Login({ onClose }) {
         payload: { access, refresh, user }
       });
 
-      // Mock successful login
-      const userData1 = {
-        id: 1,
-        username: username,
-        email: `${username}@colombianstay.com`,
-        firstName: username.charAt(0).toUpperCase() + username.slice(1),
-        isAuthenticated: true,
-      };
-
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid credentials. Please try again.");
     } finally {

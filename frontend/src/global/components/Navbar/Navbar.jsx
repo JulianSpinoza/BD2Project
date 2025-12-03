@@ -3,12 +3,12 @@ import SearchBarAutocomplete from "../SearchBarAutocomplete/SearchBarAutocomplet
 import { useListingsContext } from "../../../modules/listings/contexts/ListingsContext.jsx";
 import { useAuthContext } from "../../../modules/users/contexts/AuthContext.jsx";
 
-const Navbar = ({ onLogout, onLoginClick, onSignupClick}) => {
+const Navbar = ({ onLoginClick, onSignupClick}) => {
   const [filterMunicipality, setFilterMunicipality] = useState("");
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // Context about the active user
-  const { state } = useAuthContext();
+  const { state, dispatch } = useAuthContext();
 
   const municipalities = [
     'Barranquilla',
@@ -57,9 +57,14 @@ const Navbar = ({ onLogout, onLoginClick, onSignupClick}) => {
 
   const handleLogout = () => {
     setIsProfileMenuOpen(false);
-    if (onLogout) {
-      onLogout();
-    }
+
+    // Removing JWT Auth from localStorage
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+
+    dispatch({
+        type: "LOGOUT",
+      })
   };
 
   const handleLoginClick = () => {
@@ -161,7 +166,6 @@ const Navbar = ({ onLogout, onLoginClick, onSignupClick}) => {
                     <>
                       <div className="px-4 py-2 text-sm border-b border-gray-200">
                         <p className="font-semibold text-gray-900">{state.user.username}</p>
-                        <p className="text-xs text-gray-500">{state.user.email}</p>
                       </div>
                       <a
                         href="#"
