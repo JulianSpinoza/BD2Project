@@ -163,7 +163,7 @@ const Navbar = ({ onLoginClick, onSignupClick}) => {
               {/* Dropdown Menu */}
               {isProfileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  {state.user ? (
+                  {state.isAuthenticated ? (
                     <>
                       <div className="px-4 py-2 text-sm border-b border-gray-200">
                         <p className="font-semibold text-gray-900">{state.user.username}</p>
