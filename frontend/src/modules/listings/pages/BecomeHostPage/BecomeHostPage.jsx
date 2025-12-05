@@ -1,8 +1,7 @@
 import React from "react";
-import PropertyFormWizard from "../PropertyFormWizard/PropertyFormWizard.jsx";
-import "../PropertyFormWizard/PropertyFormWizard.css";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../contexts/AuthContext.jsx";
+import { useAuthContext } from "../../../users/contexts/AuthContext.jsx";
+import PropertyFormWizard from "../../components/PropertyFormWizard/PropertyFormWizard.jsx";
 const BecomeHostPage = () => {
   
   const { state , dispatch } = useAuthContext();
@@ -51,7 +50,7 @@ const BecomeHostPage = () => {
       </div>
 
       {/* Wizard Component */}
-      <PropertyFormWizard />
+      <PropertyFormWizard/>
     </div>
   );
 };

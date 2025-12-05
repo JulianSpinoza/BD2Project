@@ -1,7 +1,7 @@
 import HomePage from "./global/pages/Home/HomePage.jsx";
 import Login from "./modules/users/components/Login/Login.jsx";
 import Signup from "./modules/users/components/Signup/Signup.jsx";
-import BecomeHostPage from "./modules/users/components/BecomeHost/BecomeHostPage.jsx";
+import BecomeHostPage from "./modules/listings/pages/BecomeHostPage/BecomeHostPage.jsx";
 import "./App.css"
 import { AuthProvider } from "./modules/users/contexts/AuthContext.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -15,7 +15,7 @@ function App() {
           <Routes>
 
             {/* Rutas públicas */}
-            <Route path="/" element={<HomePage />}>
+            <Route path="*" element={<HomePage />}>
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Signup />} />
             </Route>
