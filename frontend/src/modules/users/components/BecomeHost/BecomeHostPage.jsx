@@ -1,18 +1,29 @@
 import React from "react";
 import PropertyFormWizard from "../PropertyFormWizard/PropertyFormWizard.jsx";
 import "../PropertyFormWizard/PropertyFormWizard.css";
+import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../contexts/AuthContext.jsx";
+const BecomeHostPage = () => {
+  
+  const { state , dispatch } = useAuthContext();
+  const navigate = useNavigate()
 
-const BecomeHostPage = ({ user, onLogout, onBack }) => {
-  if (!user) {
-    return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You must be logged in to become a host.</p>
-        </div>
-      </div>
-    );
-  }
+  const onBack = () => {
+    navigate("/")
+  } 
+
+  const onLogout = () => {
+    navigate("/");
+
+    // Removing JWT Auth from localStorage
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+
+    // Update context to Logout
+    dispatch({
+        type: "LOGOUT",
+      })
+  } 
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -28,7 +39,7 @@ const BecomeHostPage = ({ user, onLogout, onBack }) => {
             </button>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-900">{user.firstName}</span>
+            <span className="text-sm font-medium text-gray-900">{state.user.username}</span>
             <button
               onClick={onLogout}
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"

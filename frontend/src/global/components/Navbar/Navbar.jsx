@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import SearchBarAutocomplete from "../SearchBarAutocomplete/SearchBarAutocomplete";
 import { useListingsContext } from "../../../modules/listings/contexts/ListingsContext.jsx";
 import { useAuthContext } from "../../../modules/users/contexts/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ onLoginClick, onSignupClick, onBecomeHost }) => {
+const Navbar = () => {
   const [filterMunicipality, setFilterMunicipality] = useState("");
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const navigate = useNavigate()
 
   // Context about the active user
   const { state, dispatch } = useAuthContext();
@@ -66,27 +68,22 @@ const Navbar = ({ onLoginClick, onSignupClick, onBecomeHost }) => {
     dispatch({
         type: "LOGOUT",
       })
+    navigate("/");
   };
 
   const handleLoginClick = () => {
     setIsProfileMenuOpen(false);
-    if (onLoginClick) {
-      onLoginClick();
-    }
+    navigate("/login");
   };
 
   const handleSignupClick = () => {
     setIsProfileMenuOpen(false);
-    if (onSignupClick) {
-      onSignupClick();
-    }
+    navigate("/register");
   };
 
   const handleBecomeHost = () => {
     setIsProfileMenuOpen(false);
-    if (onBecomeHost) {
-      onBecomeHost();
-    }
+    navigate("/become-host")
   };
 
   return (
@@ -148,7 +145,7 @@ const Navbar = ({ onLoginClick, onSignupClick, onBecomeHost }) => {
             <div className="relative">
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-full hover:shadow-md transition-shadow"
+                className="flex items-center gap-2 px-3 py-2 border border-none rounded-full hover:shadow-md transition-shadow"
               >
                 <svg
                   className="w-5 h-5 text-gray-700"

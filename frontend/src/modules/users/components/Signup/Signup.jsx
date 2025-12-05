@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import './Signup.css'
 import { registerUser } from "../../services/usersService";
+import { useNavigate } from "react-router-dom";
 
-const Signup = ({ onClose }) => {
+const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate()
+
+  const onClose = () => {
+    navigate("/")
+  } 
 
   const validateEmail = (e) => {
     // simple regex

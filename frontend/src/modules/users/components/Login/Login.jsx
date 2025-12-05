@@ -1,15 +1,21 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import './Login.css'
 import { useAuthContext } from "../../contexts/AuthContext";
 import { loginUser } from "../../services/usersService";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
-function Login({ onClose }) {
+function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { dispatch } = useAuthContext();
+  const navigate = useNavigate()
+
+  const onClose = () => {
+    navigate("/")
+  } 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
