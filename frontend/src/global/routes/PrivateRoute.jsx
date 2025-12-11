@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuthContext } from "../../modules/users/contexts/AuthContext";
 
 // PrivateRoute: can optionally require that the authenticated user is a host
-export default function PrivateRoute({ children, requireHost = false }) {
+export default function PrivateRoute({ children, requireHost = true }) {
   const { state } = useAuthContext();
 
   if (!state.isAuthenticated) {

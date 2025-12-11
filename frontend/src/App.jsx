@@ -45,10 +45,15 @@ function App() {
               }
             />
             {/* Rutas (temporarily public for testing) */}
-            <Route path="/become-host-test" element={<BecomeHostPage />} />
+            <Route path="/become-host" element={
+                  <BecomeHostPage />} />
+                
 
             {/* Host-only availability/price manager (now public for tests) */}
-            <Route path="/host/availability" element={<PropertyManager />} />
+            <Route path="/host/availability" element={
+              <PrivateRoute>
+                <PropertyManager />
+              </PrivateRoute>} />
 
             {/* User profile (now public for tests) */}
             <Route path="/profile" element={<ProfilePage />} />
