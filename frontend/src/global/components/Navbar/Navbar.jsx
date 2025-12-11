@@ -83,7 +83,18 @@ const Navbar = () => {
 
   const handleBecomeHost = () => {
     setIsProfileMenuOpen(false);
-    navigate("/become-host")
+    navigate("/become-host");
+  };
+
+  const isHost = state?.user?.is_host || state?.user?.isHost || true;
+  const handleManageAvailability = () => {
+    setIsProfileMenuOpen(true);
+    navigate("/host/availability");
+  };
+
+  const handleProfileClick = () => {
+    setIsProfileMenuOpen(false);
+    navigate("/profile");
   };
 
   return (
@@ -118,13 +129,22 @@ const Navbar = () => {
 
           {/* Right Menu */}
           <div className="flex items-center gap-4">
-            {/* Become a Host Link */}
-            <button 
-              onClick={handleBecomeHost}
-              className="hidden sm:block text-gray-700 font-medium hover:bg-gray-100 px-4 py-2 rounded-full transition-colors"
-            >
-              Become a host
-            </button>
+            {/* Become a Host / Manage Availability Link */}
+            {isHost ? (
+              <button
+                onClick={handleManageAvailability}
+                className="hidden sm:block text-gray-700 font-medium hover:bg-gray-100 px-4 py-2 rounded-full transition-colors"
+              >
+                Manage availability
+              </button>
+            ) : (
+              <button
+                onClick={handleBecomeHost}
+                className="hidden sm:block text-gray-700 font-medium hover:bg-gray-100 px-4 py-2 rounded-full transition-colors"
+              >
+                Become a host
+              </button>
+            )}
 
             {/* Language/Currency */}
             <button className="hidden sm:block p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -175,6 +195,12 @@ const Navbar = () => {
                       <div className="px-4 py-2 text-sm border-b border-gray-200">
                         <p className="font-semibold text-gray-900">{state.user.username}</p>
                       </div>
+                      <button
+                        onClick={handleProfileClick}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        My Profile
+                      </button>
                       <a
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -186,12 +212,6 @@ const Navbar = () => {
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         Saved
-                      </a>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Account
                       </a>
                       <hr className="my-2" />
                       <button
@@ -217,12 +237,21 @@ const Navbar = () => {
                         Sign up
                       </button>
                       <hr className="my-2" />
-                      <button
-                        onClick={handleBecomeHost}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Become a host
-                      </button>
+                      {isHost ? (
+                        <button
+                          onClick={handleManageAvailability}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Manage availability
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleBecomeHost}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Become a host
+                        </button>
+                      )}
                       <a
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

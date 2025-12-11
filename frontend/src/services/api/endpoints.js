@@ -3,6 +3,7 @@ export const BACKENDDJANGO = "http://localhost:8000/api/";
 export const LISTINGS_ENDPOINTS = {
   ALL: "listings/",
   DETAIL: (id) => `listings/${id}/`,
+  PUBLISH: "publish-listing/"
 };
 
 export const RATINGS_ENDPOINTS = {

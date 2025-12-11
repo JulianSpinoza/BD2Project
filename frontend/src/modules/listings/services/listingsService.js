@@ -20,3 +20,12 @@ export const getListings = async (query = {}) => {
     throw error;
   }
 };
+
+export const publishProperty = async (property, privateConnection) => {
+  try {
+    const response = await privateConnection.post(LISTINGS_ENDPOINTS.PUBLISH, property);
+  } catch (error) {
+    console.error("Error publishing property:", error);
+    throw error;
+  }
+}

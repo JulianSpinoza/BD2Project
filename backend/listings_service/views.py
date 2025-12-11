@@ -1,10 +1,12 @@
 from rest_framework import generics, status
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Avg
 
 from .models import Municipality, Listing, Rating
-from .serializers import ListingSerializer, RatingSerializer
+from .serializers import ListingSerializer, RatingSerializer, PublishListingSerializer
+
 
 class ListingListView(generics.ListAPIView):
     
@@ -31,7 +33,6 @@ class ListingListView(generics.ListAPIView):
                 return qs.none()
 
         return qs
-
 
 class HostRatingsView(generics.ListAPIView):
     #Vista para obtener todos los ratings de las propiedades del host que está ctualmente
@@ -66,3 +67,28 @@ class HostRatingsView(generics.ListAPIView):
             })
         
         return Response(ratings_data)
+    
+class PublishProperty(APIView):
+    def post(self, request):
+        # Pasr municipality de name a id
+        print(f"Datos recibidos: {request.data}")
+        print(f"Usuario recibido: {request.user}")
+        property = request.data
+        try:
+            city = Municipality.objects.get(name=property.pop('city'))
+        except Municipality.DoesNotExist:
+            print("Error: Municipality could not be found")
+        except Municipality.MultipleObjectsReturned:
+            print("Error: Multiple municipalities found")
+        else:
+            print(f"Id ciudad:{city}")
+            serializer = PublishListingSerializer(data=property)
+            if serializer.is_valid():
+                serializer.save(owner=request.user,municipality=city)
+                return Response(
+                    {
+                        "message": "Property created successfully.",
+                    },
+                    status=status.HTTP_201_CREATED
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

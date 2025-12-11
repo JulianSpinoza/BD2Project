@@ -1,0 +1,369 @@
+import { useState, useEffect } from "react";
+import ReservationCard from "../../../listings/components/ReservationCard/ReservationCard.jsx";
+import CancelReservationModal from "../../../listings/components/CancelReservationModal/CancelReservationModal.jsx";
+
+/**
+ * UserReservationsDashboard
+ * User Story: 'Como usuario, quiero ver mis reservas y poder cancelarlas'
+ * 
+ * Features:
+ * - Muestra lista de reservas del usuario actual
+ * - Información de cada propiedad (título, localización, foto)
+ * - Filtros: Próximas, Pasadas, Canceladas
+ * - Búsqueda por nombre de propiedad
+ * - Lógica de cancelación con modal de confirmación
+ * - Actualización optimista de UI
+ * - Acceso a detalles de la propiedad
+ */
+const UserReservationsDashboard = () => {
+  const [reservations, setReservations] = useState([]);
+  const [filteredReservations, setFilteredReservations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all"); // all, upcoming, past, cancelled
+  const [selectedReservationId, setSelectedReservationId] = useState(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Mock data - En producción, obtener del backend
+  const mockReservations = [
+    {
+      id: "RES101",
+      property: {
+        id: "PROP001",
+        title: "Apartamento Moderno en Bogotá",
+        location: "Teusaquillo, Bogotá",
+        image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
+      },
+      start_date: "2025-12-20",
+      end_date: "2025-12-25",
+      status: "confirmed",
+      total_price: 850000,
+      created_at: "2025-12-01",
+    },
+    {
+      id: "RES102",
+      property: {
+        id: "PROP003",
+        title: "Cabaña en la Montaña",
+        location: "Zipaquirá, Cundinamarca",
+        image: "https://images.unsplash.com/photo-1506479773649-6bde12d37357?w=400&h=300&fit=crop",
+      },
+      start_date: "2025-11-01",
+      end_date: "2025-11-08",
+      status: "completed",
+      total_price: 1200000,
+      created_at: "2025-10-01",
+    },
+    {
+      id: "RES103",
+      property: {
+        id: "PROP004",
+        title: "Casa de Playa en Cartagena",
+        location: "Cartagena, Bolívar",
+        image: "https://images.unsplash.com/photo-1501183007986-d339d0da3123?w=400&h=300&fit=crop",
+      },
+      start_date: "2025-09-15",
+      end_date: "2025-09-20",
+      status: "cancelled",
+      total_price: 950000,
+      created_at: "2025-08-20",
+    },
+    {
+      id: "RES104",
+      property: {
+        id: "PROP005",
+        title: "Loft Moderno en Medellín",
+        location: "El Poblado, Medellín",
+        image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
+      },
+      start_date: "2026-02-10",
+      end_date: "2026-02-15",
+      status: "confirmed",
+      total_price: 720000,
+      created_at: "2025-12-10",
+    },
+    {
+      id: "RES105",
+      property: {
+        id: "PROP006",
+        title: "Villa Exclusiva con Piscina",
+        location: "Envigado, Medellín",
+        image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+      },
+      start_date: "2025-10-05",
+      end_date: "2025-10-10",
+      status: "completed",
+      total_price: 1500000,
+      created_at: "2025-09-01",
+    },
+  ];
+
+  // Cargar reservas (mock)
+  useEffect(() => {
+    setIsLoading(true);
+    setError("");
+    try {
+      // En producción: const response = await httpClient.get('/api/user/reservations/');
+      // setReservations(response.data);
+      setReservations(mockReservations);
+    } catch (err) {
+      setError("Error al cargar tus reservas");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Aplicar filtros y búsqueda
+  useEffect(() => {
+    let filtered = reservations;
+
+    // Filtro por búsqueda
+    if (searchTerm) {
+      filtered = filtered.filter((res) =>
+        res.property.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtro por estado
+    const today = new Date();
+    if (activeFilter === "upcoming") {
+      filtered = filtered.filter(
+        (res) =>
+          new Date(res.start_date) > today && res.status === "confirmed"
+      );
+    } else if (activeFilter === "past") {
+      filtered = filtered.filter(
+        (res) =>
+          new Date(res.end_date) < today && res.status !== "cancelled"
+      );
+    } else if (activeFilter === "cancelled") {
+      filtered = filtered.filter((res) => res.status === "cancelled");
+    }
+
+    setFilteredReservations(filtered);
+  }, [searchTerm, activeFilter, reservations]);
+
+  // Manejar cancelación
+  const handleCancelReservation = async (reservationId) => {
+    setIsCancelling(true);
+    try {
+      // Actualizar optimistamente en la UI
+      setReservations((prev) =>
+        prev.map((res) =>
+          res.id === reservationId ? { ...res, status: "cancelled" } : res
+        )
+      );
+
+      setIsCancelModalOpen(false);
+      setSuccessMessage("Tu reserva ha sido cancelada");
+
+      // En producción: simular API call
+      // await httpClient.patch(`/api/reservations/${reservationId}/cancel/`);
+
+      // Simular delay de API
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      // Limpiar mensaje de éxito después de 3 segundos
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      setError("Error al cancelar la reserva");
+      console.error(err);
+      // Revertir cambio optimista en caso de error
+      setReservations(mockReservations);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  // Abrir modal de confirmación
+  const handleOpenCancelModal = (reservationId) => {
+    setSelectedReservationId(reservationId);
+    setIsCancelModalOpen(true);
+  };
+
+  const selectedReservation = reservations.find(
+    (res) => res.id === selectedReservationId
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 flex justify-center">
+      <div className="w-full max-w-6xl">
+        {/* Encabezado */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Mis Reservas
+          </h1>
+          <p className="text-gray-600">
+            Aquí puedes ver y gestionar todas tus reservas
+          </p>
+        </div>
+
+        {/* Tarjeta de información */}
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+          <svg
+            className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div>
+            <p className="text-sm text-blue-800">
+              <strong>Tip:</strong> Puedes cancelar una reserva hasta 7 días antes de la fecha de llegada sin penalización.
+            </p>
+          </div>
+        </div>
+
+        {/* Mensaje de éxito */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+            <svg
+              className="w-5 h-5 text-green-600"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-green-800">{successMessage}</span>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800">{error}</p>
+          </div>
+        )}
+
+        {/* Buscador y Filtros */}
+        <div className="mb-6 space-y-4">
+          {/* Buscador */}
+          <div className="relative">
+            <svg
+              className="absolute left-3 top-3 h-5 w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              placeholder="Buscar una propiedad..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Filtros */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: "all", label: "Todas", icon: "📋" },
+              { key: "upcoming", label: "Próximas", icon: "📅" },
+              { key: "past", label: "Pasadas", icon: "✅" },
+              { key: "cancelled", label: "Canceladas", icon: "❌" },
+            ].map((filter) => (
+              <button
+                key={filter.key}
+                onClick={() => setActiveFilter(filter.key)}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  activeFilter === filter.key
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                {filter.icon} {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Lista de reservas */}
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          </div>
+        ) : filteredReservations.length > 0 ? (
+          <div className="space-y-4">
+            {/* Contador */}
+            <p className="text-sm text-gray-600 mb-4">
+              {filteredReservations.length}{" "}
+              {filteredReservations.length === 1 ? "reserva" : "reservas"}
+            </p>
+
+            {/* Tarjetas de reserva */}
+            {filteredReservations.map((reservation) => (
+              <ReservationCard
+                key={reservation.id}
+                reservation={reservation}
+                showGuestInfo={false}
+                isHost={false}
+                onCancel={handleOpenCancelModal}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">
+              No hay reservas
+            </h3>
+            <p className="text-gray-600 mb-4">
+              {searchTerm
+                ? "No hay reservas que coincidan con tu búsqueda"
+                : "Aún no has hecho ninguna reserva"}
+            </p>
+            <a
+              href="/"
+              className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            >
+              Explorar propiedades
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* Modal de confirmación de cancelación */}
+      <CancelReservationModal
+        isOpen={isCancelModalOpen}
+        reservationId={selectedReservationId}
+        propertyTitle={selectedReservation?.property?.title || ""}
+        onConfirm={handleCancelReservation}
+        onCancel={() => setIsCancelModalOpen(false)}
+        isLoading={isCancelling}
+      />
+    </div>
+  );
+};
+
+export default UserReservationsDashboard;
