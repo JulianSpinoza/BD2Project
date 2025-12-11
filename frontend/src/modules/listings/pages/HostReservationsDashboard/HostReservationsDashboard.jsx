@@ -3,20 +3,9 @@ import ReservationCard from "../../components/ReservationCard/ReservationCard.js
 import CancelReservationModal from "../../components/CancelReservationModal/CancelReservationModal.jsx";
 import { useAuthContext } from "../../../users/contexts/AuthContext.jsx";
 import { BOOKINGS_ENDPOINTS } from "../../../../services/api/endpoints.js";
-/**
- * HostReservationsDashboard
- * User Story: 'Como anfitrión, quiero ver todas las reservas de mis propiedades'
- * 
- * Features:
- * - Muestra lista de reservas de propiedades del anfitrión
- * - Información del guest (nombre, email, foto)
- * - Filtros: Próximas, Pasadas, Canceladas
- * - Búsqueda por nombre de propiedad
- * - Lógica de cancelación con modal de confirmación
- * - Actualización optimista de UI
- */
+
 const HostReservationsDashboard = () => {
-  const { state, dispatch, axiosInstance } = useAuthContext();
+  const { axiosInstance } = useAuthContext();
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -179,7 +168,7 @@ const HostReservationsDashboard = () => {
         {/* Encabezado */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Mis Reservas
+            Reservas hechas a mis alojamientos
           </h1>
           <p className="text-gray-600">
             Gestiona todas las reservas de tus propiedades

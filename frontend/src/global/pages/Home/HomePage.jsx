@@ -16,7 +16,7 @@ const HomePage = () => {
 
         <Navbar />
 
-        <CategoryBar />
+        {/*<CategoryBar />*/}
 
         {/* Main Content */}
         <Routes>

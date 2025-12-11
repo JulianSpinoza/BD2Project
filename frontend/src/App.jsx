@@ -69,6 +69,7 @@ function App() {
 
             {/* User reservations dashboard (now public for tests) */}
             <Route path="/my-reservations" element={<UserReservationsDashboard />} />
+
           </Routes>
         </BrowserRouter>
       </AuthProvider>

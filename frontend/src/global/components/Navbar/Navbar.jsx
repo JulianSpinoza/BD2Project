@@ -86,7 +86,7 @@ const Navbar = () => {
     navigate("/become-host");
   };
 
-  const handleMyReservations = () => {
+  const handleHostReservations = () => {
     setIsProfileMenuOpen(false);
     navigate("/host/reservations");
   };
@@ -134,14 +134,7 @@ const Navbar = () => {
           {/* Right Menu */}
           <div className="flex items-center gap-4">
             {/* My Reservations / Become a Host Link */}
-            {state.isAuthenticated ? (
-              <button
-                onClick={handleMyReservations}
-                className="hidden sm:block text-gray-700 font-medium hover:bg-gray-100 px-4 py-2 rounded-full transition-colors"
-              >
-                My Reservations
-              </button>
-            ) : (
+            {!(state.isAuthenticated) && (
               <button
                 onClick={handleBecomeHost}
                 className="hidden sm:block text-gray-700 font-medium hover:bg-gray-100 px-4 py-2 rounded-full transition-colors"
@@ -205,23 +198,23 @@ const Navbar = () => {
                       >
                         My Profile
                       </button>
-                      <a
+                      <button
                         onClick={handleBecomeHost}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         Publish property
-                      </a>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      </button>
+                      <button
+                        onClick={handleHostReservations}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        Saved
-                      </a>
+                        My Listings Reservations
+                      </button>
                       <button
                         onClick={handleUserReservations}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        My Reservations
+                        My Guest Reservations
                       </button>
                       <hr className="my-2" />
                       <button
@@ -253,12 +246,12 @@ const Navbar = () => {
                       >
                         Become a host
                       </button>
-                      <a
+                      <button
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         Help
-                      </a>
+                      </button>
                     </>
                   )}
                 </div>
