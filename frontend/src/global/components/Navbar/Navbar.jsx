@@ -86,10 +86,9 @@ const Navbar = () => {
     navigate("/become-host");
   };
 
-  const isHost = state?.user?.is_host || state?.user?.isHost || true;
-  const handleManageAvailability = () => {
-    setIsProfileMenuOpen(true);
-    navigate("/host/availability");
+  const handleMyReservations = () => {
+    setIsProfileMenuOpen(false);
+    navigate("/host/reservations");
   };
 
   const handleProfileClick = () => {
@@ -129,13 +128,13 @@ const Navbar = () => {
 
           {/* Right Menu */}
           <div className="flex items-center gap-4">
-            {/* Become a Host / Manage Availability Link */}
-            {isHost ? (
+            {/* My Reservations / Become a Host Link */}
+            {state.isAuthenticated ? (
               <button
-                onClick={handleManageAvailability}
+                onClick={handleMyReservations}
                 className="hidden sm:block text-gray-700 font-medium hover:bg-gray-100 px-4 py-2 rounded-full transition-colors"
               >
-                Manage availability
+                My Reservations
               </button>
             ) : (
               <button
@@ -213,6 +212,12 @@ const Navbar = () => {
                       >
                         Saved
                       </a>
+                      <button
+                        onClick={handleMyReservations}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        My Reservations
+                      </button>
                       <hr className="my-2" />
                       <button
                         onClick={handleLogout}
@@ -237,21 +242,12 @@ const Navbar = () => {
                         Sign up
                       </button>
                       <hr className="my-2" />
-                      {isHost ? (
-                        <button
-                          onClick={handleManageAvailability}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Manage availability
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleBecomeHost}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Become a host
-                        </button>
-                      )}
+                      <button
+                        onClick={handleBecomeHost}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Become a host
+                      </button>
                       <a
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

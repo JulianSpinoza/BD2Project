@@ -38,7 +38,7 @@ const BecomeHostPage = () => {
             </button>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-900">{state.user.username}</span>
+            <span className="text-sm font-medium text-gray-900">{state?.user?.username || "Guest"}</span>
             <button
               onClick={onLogout}
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
