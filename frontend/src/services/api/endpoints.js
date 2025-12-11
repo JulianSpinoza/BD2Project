@@ -12,6 +12,13 @@ export const RATINGS_ENDPOINTS = {
   HOST_RATINGS: "host-ratings/",
 };
 
+export const BOOKINGS_ENDPOINTS = {
+  HOST_RESERVATIONS: "host-reservations/",
+  USER_RESERVATIONS: "user-reservations/",
+  CREATE: "bookings/",
+  CANCEL: (id) => `reservations/${id}/cancel/`,
+};
+
 export const USERS_ENDPOINTS = {
   REGISTER: "register/",
   LOGIN: "auth/login/",

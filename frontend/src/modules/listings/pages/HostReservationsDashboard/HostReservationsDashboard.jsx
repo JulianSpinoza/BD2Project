@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReservationCard from "../../components/ReservationCard/ReservationCard.jsx";
 import CancelReservationModal from "../../components/CancelReservationModal/CancelReservationModal.jsx";
 import { useAuthContext } from "../../../users/contexts/AuthContext.jsx";
+import { BOOKINGS_ENDPOINTS } from "../../../../services/api/endpoints.js";
 /**
  * HostReservationsDashboard
  * User Story: 'Como anfitrión, quiero ver todas las reservas de mis propiedades'
@@ -15,7 +16,7 @@ import { useAuthContext } from "../../../users/contexts/AuthContext.jsx";
  * - Actualización optimista de UI
  */
 const HostReservationsDashboard = () => {
-  const { state , dispatch, axiosInstance } = useAuthContext();
+  const { state, dispatch, axiosInstance } = useAuthContext();
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,106 +28,59 @@ const HostReservationsDashboard = () => {
   const [isCancelling, setIsCancelling] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Mock data - En producción, obtener del backend
-  const mockReservations = [
-    {
-      id: "RES001",
-      property: {
-        id: "PROP001",
-        title: "Apartamento Moderno en Bogotá",
-        location: "Teusaquillo, Bogotá",
-        image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
-      },
-      guest: {
-        id: "GUEST001",
-        name: "Carlos Mendoza",
-        email: "carlos@example.com",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos",
-      },
-      start_date: "2025-12-20",
-      end_date: "2025-12-25",
-      status: "confirmed",
-      total_price: 850000,
-      created_at: "2025-12-01",
-    },
-    {
-      id: "RES002",
-      property: {
-        id: "PROP001",
-        title: "Apartamento Moderno en Bogotá",
-        location: "Teusaquillo, Bogotá",
-        image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
-      },
-      guest: {
-        id: "GUEST002",
-        name: "María Rodríguez",
-        email: "maria@example.com",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-      },
-      start_date: "2025-11-10",
-      end_date: "2025-11-15",
-      status: "completed",
-      total_price: 600000,
-      created_at: "2025-10-15",
-    },
-    {
-      id: "RES003",
-      property: {
-        id: "PROP002",
-        title: "Casa Campestre con Piscina",
-        location: "La Vega, Cundinamarca",
-        image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
-      },
-      guest: {
-        id: "GUEST003",
-        name: "Juan Pérez",
-        email: "juan@example.com",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Juan",
-      },
-      start_date: "2025-10-01",
-      end_date: "2025-10-05",
-      status: "cancelled",
-      total_price: 450000,
-      created_at: "2025-09-20",
-    },
-    {
-      id: "RES004",
-      property: {
-        id: "PROP002",
-        title: "Casa Campestre con Piscina",
-        location: "La Vega, Cundinamarca",
-        image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
-      },
-      guest: {
-        id: "GUEST004",
-        name: "Laura Gómez",
-        email: "laura@example.com",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Laura",
-      },
-      start_date: "2026-01-15",
-      end_date: "2026-01-20",
-      status: "confirmed",
-      total_price: 700000,
-      created_at: "2025-12-05",
-    },
-  ];
+  // Cargar reservas desde el API
+  useEffect(() => {
+    const fetchReservations = async () => {
+      setIsLoading(true);
+      setError("");
+      try {
+        if (!axiosInstance) {
+          setError("No hay instancia de axios configurada");
+          setIsLoading(false);
+          return;
+        }
 
-  // Cargar reservas (mock)
-  useEffect(async () => {
-    setIsLoading(true);
-    setError("");
-    try {
-      const response = await axiosInstance.get('hostreservations/');
-      // setReservations(response.data);
-      console.log("Reservas obtenidas:", response.data);
+        const response = await axiosInstance.get(BOOKINGS_ENDPOINTS.HOST_RESERVATIONS);
+        console.log("Reservas obtenidas:", response.data);
+        
+        // Mapear respuesta del backend al formato esperado por el componente
+        const formattedReservations = response.data.map((booking) => ({
+          id: booking.bookingid,
+          property: {
+            id: booking.listing_id,
+            title: booking.listing_title,
+            location: booking.listing_location,
+            image: booking.listing_image,
+          },
+          guest: {
+            id: booking.guest,
+            name: booking.guest_name,
+            email: booking.guest_email,
+            avatar: booking.guest_avatar,
+          },
+          start_date: booking.check_in_date,
+          end_date: booking.check_out_date,
+          status: booking.status,
+          total_price: booking.total_price,
+          created_at: booking.created_at,
+        }));
 
-    } catch (err) {
-      setError("Error al cargar las reservas");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        setReservations(formattedReservations);
+      } catch (err) {
+        console.error("Error al cargar reservas:", err);
+        if (err.response?.status === 401) {
+          setError("Debes estar autenticado para ver tus reservas");
+        } else {
+          setError("Error al cargar las reservas");
+        }
+        setReservations([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReservations();
+  }, [axiosInstance]);
 
   // Aplicar filtros y búsqueda
   useEffect(() => {
@@ -174,11 +128,25 @@ const HostReservationsDashboard = () => {
       setIsCancelModalOpen(false);
       setSuccessMessage("Reserva cancelada correctamente");
 
-      // En producción: simular API call
-      // await httpClient.patch(`/api/reservations/${reservationId}/cancel/`);
-
-      // Simular delay de API
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // Llamar al API para cancelar la reserva
+      try {
+        await axiosInstance.patch(BOOKINGS_ENDPOINTS.CANCEL(reservationId), {
+          status: "cancelled"
+        });
+      } catch (apiError) {
+        console.error("Error al cancelar en el backend:", apiError);
+        // Revertir cambio optimista en caso de error del API
+        setReservations((prev) =>
+          prev.map((res) =>
+            res.id === reservationId 
+              ? { ...res, status: "confirmed" } 
+              : res
+          )
+        );
+        setError("Error al cancelar la reserva. Intenta de nuevo.");
+        setSuccessMessage("");
+        return;
+      }
 
       // Limpiar mensaje de éxito después de 3 segundos
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -186,7 +154,10 @@ const HostReservationsDashboard = () => {
       setError("Error al cancelar la reserva");
       console.error(err);
       // Revertir cambio optimista en caso de error
-      setReservations(mockReservations);
+      const updatedReservations = reservations.map((res) =>
+        res.id === reservationId ? { ...res, status: "confirmed" } : res
+      );
+      setReservations(updatedReservations);
     } finally {
       setIsCancelling(false);
     }

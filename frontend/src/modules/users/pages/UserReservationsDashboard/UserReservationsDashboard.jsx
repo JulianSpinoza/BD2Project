@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import ReservationCard from "../../../listings/components/ReservationCard/ReservationCard.jsx";
 import CancelReservationModal from "../../../listings/components/CancelReservationModal/CancelReservationModal.jsx";
+import { useAuthContext } from "../../contexts/AuthContext.jsx";
+import { BOOKINGS_ENDPOINTS } from "../../../../services/api/endpoints.js";
 
 /**
  * UserReservationsDashboard
@@ -101,21 +103,47 @@ const UserReservationsDashboard = () => {
     },
   ];
 
-  // Cargar reservas (mock)
+  const { axiosInstance } = useAuthContext();
+
+  // Cargar reservas desde el API
   useEffect(() => {
-    setIsLoading(true);
-    setError("");
-    try {
-      // En producción: const response = await httpClient.get('/api/user/reservations/');
-      // setReservations(response.data);
-      setReservations(mockReservations);
-    } catch (err) {
-      setError("Error al cargar tus reservas");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    const fetchReservations = async () => {
+      setIsLoading(true);
+      setError("");
+      try {
+        if (!axiosInstance) {
+          setReservations(mockReservations);
+          return;
+        }
+
+        const res = await axiosInstance.get(BOOKINGS_ENDPOINTS.USER_RESERVATIONS);
+        const formatted = res.data.map((booking) => ({
+          id: booking.bookingid,
+          property: {
+            id: booking.listing_id,
+            title: booking.listing_title,
+            location: booking.listing_location,
+            image: booking.listing_image,
+          },
+          start_date: booking.check_in_date,
+          end_date: booking.check_out_date,
+          status: booking.status,
+          total_price: booking.total_price,
+          created_at: booking.created_at,
+        }));
+
+        setReservations(formatted);
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar tus reservas");
+        setReservations([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReservations();
+  }, [axiosInstance]);
 
   // Aplicar filtros y búsqueda
   useEffect(() => {
@@ -161,11 +189,19 @@ const UserReservationsDashboard = () => {
       setIsCancelModalOpen(false);
       setSuccessMessage("Tu reserva ha sido cancelada");
 
-      // En producción: simular API call
-      // await httpClient.patch(`/api/reservations/${reservationId}/cancel/`);
-
-      // Simular delay de API
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // En producción: llamar al API para cancelar
+      try {
+        if (axiosInstance) {
+          await axiosInstance.patch(BOOKINGS_ENDPOINTS.CANCEL(reservationId), { status: 'cancelled' });
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 800));
+        }
+      } catch (apiErr) {
+        console.error('API cancel error', apiErr);
+        setError('Error al cancelar la reserva en el servidor');
+        // Revertir
+        setReservations(mockReservations);
+      }
 
       // Limpiar mensaje de éxito después de 3 segundos
       setTimeout(() => setSuccessMessage(""), 3000);

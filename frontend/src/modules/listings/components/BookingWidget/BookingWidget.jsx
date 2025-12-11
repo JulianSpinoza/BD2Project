@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../../users/contexts/AuthContext.jsx";
+import { BOOKINGS_ENDPOINTS } from "../../../../services/api/endpoints.js";
 
 /**
  * BookingWidget
@@ -19,6 +21,7 @@ const BookingWidget = ({
   onReservationSuccess,
 }) => {
   const navigate = useNavigate();
+  const { axiosInstance } = useAuthContext();
 
   // Form state
   const [checkInDate, setCheckInDate] = useState("");
@@ -115,29 +118,42 @@ const BookingWidget = ({
 
       console.log("📋 Reservation Data:", reservationData);
 
-      // Simulate API call - Replace with actual API call later
-      // const response = await httpClient.post('/api/bookings/', reservationData);
-
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Success
-      setSuccess(true);
-
-      // Optional: Call parent callback
-      if (onReservationSuccess) {
-        onReservationSuccess(reservationData);
+      // Call real API
+      if (!axiosInstance) {
+        throw new Error("No axios instance available");
       }
 
-      // Redirect to confirmation page after 2 seconds
-      setTimeout(() => {
-        navigate("/reservation-confirmation", {
-          state: {
-            reservation: reservationData,
-            propertyId,
-          },
-        });
-      }, 2000);
+      const payload = {
+        property_id: propertyId,
+        start_date: checkInDate,
+        end_date: checkOutDate,
+        guests: parseInt(guests),
+        number_of_guests: parseInt(guests),
+        total_price: pricing.total,
+      };
+
+      const response = await axiosInstance.post(BOOKINGS_ENDPOINTS.CREATE, payload);
+
+      // Success - combine server response with client-side pricing details
+      const serverBooking = response.data;
+      const combined = {
+        ...serverBooking,
+        // backend uses check_in_date/check_out_date, frontend components expect start_date/end_date
+        start_date: serverBooking.check_in_date || reservationData.start_date,
+        end_date: serverBooking.check_out_date || reservationData.end_date,
+        nights: pricing.nights,
+        subtotal: pricing.subtotal,
+        cleaning_fee: pricing.cleaningFee,
+        service_fee: pricing.serviceFee,
+        guests: parseInt(guests),
+      };
+
+      setSuccess(true);
+
+      if (onReservationSuccess) onReservationSuccess(combined);
+
+      // Redirect immediately to confirmation page with combined data
+      navigate("/reservation-confirmation", { state: { reservation: combined } });
     } catch (err) {
       console.error("❌ Reservation Error:", err);
       setError(

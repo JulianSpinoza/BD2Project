@@ -229,7 +229,7 @@ const ReservationConfirmation = () => {
                 </button>
 
                 <button
-                  onClick={() => navigate("/profile")}
+                  onClick={() => navigate("/my-reservations")}
                   className="w-full py-3 rounded-lg font-semibold text-indigo-600 border border-indigo-600 hover:bg-indigo-50 transition"
                 >
                   View My Reservations

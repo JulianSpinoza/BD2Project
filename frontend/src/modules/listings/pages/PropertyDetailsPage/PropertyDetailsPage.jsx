@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import BookingWidget from "../../components/BookingWidget/BookingWidget.jsx";
+import { useAuthContext } from "../../../users/contexts/AuthContext.jsx";
+import { LISTINGS_ENDPOINTS } from "../../../../services/api/endpoints.js";
 
 /**
  * PropertyDetailsPage
@@ -13,53 +15,53 @@ const PropertyDetailsPage = () => {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { axiosInstance } = useAuthContext();
 
-  // Mock property data - replace with API call later
+  // Fetch property from backend
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockProperty = {
-        id: parseInt(id) || 1,
-        title: "Beautiful Colonial House in Cartagena",
-        location: "Cartagena, Bolívar",
-        price: 250000,
-        rating: 4.9,
-        reviews: 128,
-        host: {
-          name: "María López",
-          avatar: "M",
-          isSuperhost: true,
-        },
-        description:
-          "Experience the charm of colonial Cartagena in this beautifully restored house. Located in the historic walled city, this property features high ceilings, traditional architecture, and modern amenities. Perfect for couples or small families wanting to explore Colombia's Caribbean coast.",
-        images: [
-          "https://images.unsplash.com/photo-1520932057f7-6fb3009d1fea?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
-          "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop",
-          "https://images.unsplash.com/photo-1517214712202-14719c45a6e0?w=400&h=300&fit=crop",
-          "https://images.unsplash.com/photo-1537090151319-8658a29e5e73?w=400&h=300&fit=crop",
-        ],
-        amenities: [
-          { icon: "🛏️", name: "2 Bedrooms" },
-          { icon: "🚿", name: "2 Bathrooms" },
-          { icon: "🍳", name: "Full Kitchen" },
-          { icon: "📺", name: "Smart TV" },
-          { icon: "🌐", name: "WiFi" },
-          { icon: "❄️", name: "Air Conditioning" },
-          { icon: "🧺", name: "Washer" },
-          { icon: "🅿️", name: "Free Parking" },
-        ],
-        highlights: [
-          "Entire home hosted by a Superhost",
-          "Self check-in with smart lock",
-          "Free cancellation before 7 days",
-          "English and Spanish spoken",
-        ],
-      };
-      setProperty(mockProperty);
-      setIsLoading(false);
-    }, 500);
-  }, [id]);
+    let mounted = true;
+    const fetchProperty = async () => {
+      setIsLoading(true);
+      try {
+        if (!axiosInstance) {
+          // fallback: mock for dev
+          setProperty({ id: parseInt(id) || 1, title: "Property not loaded", location: "", price: 0, rating: 0, reviews: 0, host: { name: "", avatar: "" }, description: "", images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop"], amenities: [], highlights: [] });
+          setIsLoading(false);
+          return;
+        }
+
+        const res = await axiosInstance.get(LISTINGS_ENDPOINTS.DETAIL(id));
+        if (!mounted) return;
+        // Map backend listing to frontend property shape
+        const listing = res.data;
+        const mapped = {
+          id: listing.accomodationid,
+          title: listing.title,
+          location: listing.locationdesc || listing.addresstext || "",
+          price: listing.pricepernight,
+          rating: listing.rating || 4.8,
+          reviews: listing.reviews || 0,
+          host: { name: listing.owner?.username || "Host", avatar: (listing.owner?.username || "H")[0] || "H", isSuperhost: false },
+          description: listing.description,
+          images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop"],
+          amenities: [],
+          highlights: [],
+        };
+        setProperty(mapped);
+      } catch (err) {
+        console.error("Error fetching property:", err);
+        setProperty(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProperty();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id, axiosInstance]);
 
   if (isLoading) {
     return (

@@ -96,6 +96,11 @@ const Navbar = () => {
     navigate("/profile");
   };
 
+  const handleUserReservations = () => {
+    setIsProfileMenuOpen(false);
+    navigate("/my-reservations");
+  }
+
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -201,10 +206,10 @@ const Navbar = () => {
                         My Profile
                       </button>
                       <a
-                        href="#"
+                        onClick={handleBecomeHost}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        Your trips
+                        Publish property
                       </a>
                       <a
                         href="#"
@@ -213,7 +218,7 @@ const Navbar = () => {
                         Saved
                       </a>
                       <button
-                        onClick={handleMyReservations}
+                        onClick={handleUserReservations}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         My Reservations
