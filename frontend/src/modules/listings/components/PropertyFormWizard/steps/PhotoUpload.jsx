@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const PhotoUpload = ({ formData, onPhotosChange }) => {
+const PhotoUpload = ({ photos, onPhotosChange }) => {
   const [dragActive, setDragActive] = useState(false);
 
   const handleDrag = (e) => {
@@ -41,26 +41,26 @@ const PhotoUpload = ({ formData, onPhotosChange }) => {
     }));
 
     // Limit to 10 photos
-    const updatedPhotos = [...formData.photos, ...newPhotos].slice(0, 10);
+    const updatedPhotos = [...photos, ...newPhotos].slice(0, 10);
     onPhotosChange(updatedPhotos);
   };
 
   const removePhoto = (id) => {
-    const updatedPhotos = formData.photos.filter((photo) => photo.id !== id);
+    const updatedPhotos = photos.filter((photo) => photo.id !== id);
     onPhotosChange(updatedPhotos);
   };
 
   const movePhotoUp = (index) => {
     if (index > 0) {
-      const newPhotos = [...formData.photos];
+      const newPhotos = [...photos];
       [newPhotos[index], newPhotos[index - 1]] = [newPhotos[index - 1], newPhotos[index]];
       onPhotosChange(newPhotos);
     }
   };
 
   const movePhotoDown = (index) => {
-    if (index < formData.photos.length - 1) {
-      const newPhotos = [...formData.photos];
+    if (index < photos.length - 1) {
+      const newPhotos = [...photos];
       [newPhotos[index], newPhotos[index + 1]] = [newPhotos[index + 1], newPhotos[index]];
       onPhotosChange(newPhotos);
     }
@@ -114,17 +114,17 @@ const PhotoUpload = ({ formData, onPhotosChange }) => {
       {/* Photos Count */}
       <div className="photos-count">
         <p>
-          {formData.photos.length} / 10 photos uploaded
-          {formData.photos.length < 3 && (
+          {photos.length} / 10 photos uploaded
+          {photos.length < 3 && (
             <span className="count-warning"> (Minimum 3 required)</span>
           )}
         </p>
       </div>
 
       {/* Photos Grid */}
-      {formData.photos.length > 0 && (
+      {photos.length > 0 && (
         <div className="photos-grid">
-          {formData.photos.map((photo, index) => (
+          {photos.map((photo, index) => (
             <div key={photo.id} className="photo-item">
               <div className="photo-image-wrapper">
                 <img src={photo.preview} alt={`Property ${index + 1}`} />
@@ -144,7 +144,7 @@ const PhotoUpload = ({ formData, onPhotosChange }) => {
                 <button
                   type="button"
                   onClick={() => movePhotoDown(index)}
-                  disabled={index === formData.photos.length - 1}
+                  disabled={index === photos.length - 1}
                   className="photo-btn photo-btn-down"
                   title="Move down"
                 >

@@ -26,6 +26,7 @@ const BecomeHostPage = () => {
   }
   
   const publish = async (property) => {
+
     try {
       await publishProperty(property, axiosInstance);
     } catch (error) {

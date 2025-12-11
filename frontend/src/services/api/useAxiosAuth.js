@@ -1,9 +1,9 @@
 import axios from "axios";
 import { BACKENDDJANGO } from "./endpoints";
-import { useEffect, useMemo, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { jwtDecode } from "jwt-decode";
 
-export function useAxiosAuth () {
+export function useAxiosAuth (axiosInstance) {
 
   const initialState = {
     access: null,
@@ -37,16 +37,6 @@ export function useAxiosAuth () {
         return state;
     }
   }
-
-  const axiosInstance = useMemo(() => { 
-    return axios.create({
-      baseURL: BACKENDDJANGO,
-      timeout: 10000,
-      headers: {
-        "Content-Type": "application/json",
-      }
-    });
-  }, []);
 
   // Initial charge of localStorage JWT
   useEffect(() => {

@@ -40,6 +40,7 @@ class Listing(models.Model):
     propertytype = models.CharField(max_length=20)
     pricepernight = models.IntegerField()
     maxguests = models.IntegerField()
+    images_id = models.JSONField(default=list)
 
     class Meta:
         db_table = 'accomodation'

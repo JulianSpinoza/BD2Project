@@ -15,7 +15,7 @@ class PublishListingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Listing
-        exclude = ['owner','municipality']
+        exclude = ['owner','municipality', 'images_id']
         read_only_fields = ['accomodationid']
         extra_kwargs = {
             'pricepernight': {'min_value': 0},

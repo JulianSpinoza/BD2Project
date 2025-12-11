@@ -20,9 +20,8 @@ const PropertyFormWizard = ({ onPublish }) => {
     locationdesc: "",
     addresstext: "",
     city: "",
-    // Step 3
-    photos: [],
   });
+  const [fileData, setFileData] = useState([]);
 
   const totalSteps = 3;
 
@@ -34,10 +33,7 @@ const PropertyFormWizard = ({ onPublish }) => {
   };
 
   const handlePhotosChange = (photos) => {
-    setFormData((prev) => ({
-      ...prev,
-      photos,
-    }));
+    setFileData(photos);
   };
 
   const handleNext = () => {
@@ -56,10 +52,22 @@ const PropertyFormWizard = ({ onPublish }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Para probar sin fotos
-    delete formData.photos;
-    onPublish(formData);
-  };
+
+    // Dict to FormData
+    const formDataType = new FormData();
+
+    fileData.forEach((file) => {
+      formDataType.append("photos", file);
+    });
+
+    formDataType.append('JsonData', JSON.stringify(formData));
+    
+    for (let pair of formDataType.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
+    onPublish(formDataType);
+  }
 
   return (
     <div className="wizard-container">
@@ -85,7 +93,7 @@ const PropertyFormWizard = ({ onPublish }) => {
 
         {/* Step 3: Photo Upload */}
         {currentStep === 3 && (
-          <PhotoUpload formData={formData} onPhotosChange={handlePhotosChange} />
+          <PhotoUpload photos={fileData} onPhotosChange={handlePhotosChange} />
         )}
 
         {/* Navigation Buttons */}

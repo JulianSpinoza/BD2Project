@@ -6,6 +6,10 @@ from rest_framework.response import Response
 from .models import Municipality, Listing
 from .serializers import ListingSerializer, PublishListingSerializer
 
+from mongodb.services import save_image_property
+
+import json
+
 class ListingListView(generics.ListAPIView):
     
     serializer_class = ListingSerializer
@@ -34,10 +38,7 @@ class ListingListView(generics.ListAPIView):
     
 class PublishProperty(APIView):
     def post(self, request):
-        # Pasr municipality de name a id
-        print(f"Datos recibidos: {request.data}")
-        print(f"Usuario recibido: {request.user}")
-        property = request.data
+        property = json.loads(request.POST.get('JsonData'))
         try:
             city = Municipality.objects.get(name=property.pop('city'))
         except Municipality.DoesNotExist:
@@ -45,10 +46,27 @@ class PublishProperty(APIView):
         except Municipality.MultipleObjectsReturned:
             print("Error: Multiple municipalities found")
         else:
-            print(f"Id ciudad:{city}")
+            # MongoDB
+            images = request.FILES.getlist("photos")
+
+            print("FILES:", request.FILES)
+
+            image_ids = []
+            for img in images:
+                file_id = save_image_property(img)
+                image_ids.append(file_id)
+
+            if "photos" in property:
+                property.pop("photos")
+
+            # PostgreSQL
             serializer = PublishListingSerializer(data=property)
             if serializer.is_valid():
-                serializer.save(owner=request.user,municipality=city)
+                serializer.save(
+                    owner=request.user,
+                    municipality=city,
+                    images_id=image_ids,
+                )
                 return Response(
                     {
                         "message": "Property created successfully.",
